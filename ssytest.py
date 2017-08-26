@@ -35,8 +35,8 @@ import config
 # rep = requests.post('http://192.168.4.221:8283/api/taskstatus/query', data={'flowid': 'f1f4189f0e6745f8bf93d226cdfcf0e9'})
 # print rep.content
 
-rep = requests.post('http://192.168.4.221:8283/api/stateclan/query', data={'taskid': '907781a34d074477ae4b5c3566918e94'})
-print rep.content
+# rep = requests.post('http://192.168.4.221:8283/api/stateclan/query', data={'taskid': '907781a34d074477ae4b5c3566918e94'})
+# print rep.content
 
 # rep = requests.post('http://192.168.4.221:8283/api/fs/listinput', data={'dirid': '200010035345400'})
 # print rep.status_code
