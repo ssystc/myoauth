@@ -25,6 +25,8 @@ class UserInfo(Base):
         self.starttime=starttime
 
 
+
+
 class UserInfoDao(object):
     @classmethod
     def addUserInfo(cls,userinfo):
@@ -53,6 +55,14 @@ class UserInfoDao(object):
                 return 'success'
             except:
                 return 'failed'
+
+    @classmethod
+    def querytokenByusername(cls, username, userId):
+        with session_scope() as session:
+            try:
+                return session.query().filter(Task.flowId == flowId, Task.userId == userId).all()
+            except:
+                return []
 
 
 

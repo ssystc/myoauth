@@ -57,7 +57,6 @@ def autho(uid):
         token_nodecrypt = repmessage['access_token']
         refresh_token_nodecrypt = repmessage['refresh_token']
         token_crypt = decrypt(token_nodecrypt)
-        refresh_token_crypt = decrypt(refresh_token_nodecrypt)
 
         verifyrep = requests.post('https://%s%s' % (config.OAUTH_URL, config.OAUTH_VARIFY_URL),
                                   data={'client_id': config.CLIENT_ID, 'token': token_crypt},
@@ -73,11 +72,7 @@ def autho(uid):
             LoginInfoDao.add(login_info)
             url = flask.url_for('test')
             return flask.redirect(url)
-        # if verifymessage['errors_code'] == 10004002:
-        #
-        #
-        #     url = flask.url_for('test')
-        #     return flask.redirect(url)
+
         else:
             return flask.jsonify({'code': 'can not login','errors_code': verifymessage['errors_code']})
 
@@ -86,27 +81,101 @@ def autho(uid):
         # config.Log.info(traceback.format_exc())
         return flask.jsonify({'code': 'can not login'})     #can not login出现时别忘了把他替换成ErrorCode.logingError
 
+# def needLogin():
+#     try:
+#         uid = flask.session['uid']
+#         logininfo = LoginInfoDao.queryByuid(uid)
+#         token = decrypt(logininfo.token)
+#         refreshtoken = logininfo.refreshtoken
+#         verifyrep = requests.post('https://%s%s' % (config.OAUTH_URL, config.OAUTH_VARIFY_URL),
+#                                   data={'client_id': config.CLIENT_ID, 'token': token},
+#                                   verify=False)
+#         verifymessage = json.loads(verifyrep.content)
+#         if verifymessage['errors_code'] == 0:
+#             return False
+#         if verifymessage['errors_code'] == 10004002:
+#             #需要在数据库中更新token和refreshtoken
+#             refreshrep = requests.post('https://%s%s' % (config.OAUTH_URL, config.OAUTH_REQUIRE_TOKEN_URL),
+#                                        data={'grant_type': 'refresh_token', 'refresh_token': refreshtoken,
+#                                              'client_id': config.CLIENT_ID},
+#                                        verify=False
+#                                        )
+#             newtokenmessage = json.loads(refreshrep.content)
+#             newtoken = newtokenmessage['access_token']
+#             newtoken_crypt = decrypt(newtoken)
+#             newrefreshtoken = newtokenmessage['refresh_token']
+#
+#             newverifyrep = requests.post('https://%s%s' % (config.OAUTH_URL, config.OAUTH_VARIFY_URL),
+#                                       data={'client_id': config.CLIENT_ID, 'token': newtoken_crypt},
+#                                       verify=False)
+#             newverifymessage = json.loads(newverifyrep.content)
+#
+#             if newverifymessage['errors_code'] == 0:
+#                 user_id = newverifymessage['userID']
+#                 user_name = newverifymessage['username']
+#                 LoginInfoDao.deleteByuserid(user_id)
+#                 login_info = LoginInfo(uid, newtoken, newrefreshtoken, user_id, user_name, time.time())
+#                 LoginInfoDao.add(login_info)
+#                 return False
+#             else:
+#                 return True
+#         else:
+#             return True
+#     except:
+#         return True
 def needLogin():
     try:
-        uid = flask.session['uid']
-        logininfo = LoginInfoDao.queryByuid(uid)
-        token = decrypt(logininfo.token)
-        refreshtoken = decrypt(logininfo.refreshtoken)
-        verifyrep = requests.post('https://%s%s' % (config.OAUTH_URL, config.OAUTH_VARIFY_URL),
-                                  data={'client_id': config.CLIENT_ID, 'token': token},
-                                  verify=False)
-        verifymessage = json.loads(verifyrep.content)
-        if verifymessage['errors_code'] == 0:
-            return False
-        if verifymessage['errors_code'] == 10004002:
-            #需要在数据库中更新token和refreshtoken
 
-
-            return False
+        if flask.request.form.get('token'):
+            token = flask.request.form.get('token')
+            token = decrypt(token)                      #需不需要我自动更新呢
+            verifyrep = requests.post('https://%s%s' % (config.OAUTH_URL, config.OAUTH_VARIFY_URL),
+                                    data={'client_id': config.CLIENT_ID, 'token': token},
+                                    verify=False)
+            verifymessage = json.loads(verifyrep.content)
+            if verifymessage['errors_code'] == 0:
+                return False
         else:
-            return True
+            uid = flask.session['uid']
+            logininfo = LoginInfoDao.queryByuid(uid)
+            token = decrypt(logininfo.token)
+            refreshtoken = logininfo.refreshtoken
+            verifyrep = requests.post('https://%s%s' % (config.OAUTH_URL, config.OAUTH_VARIFY_URL),
+                                      data={'client_id': config.CLIENT_ID, 'token': token},
+                                      verify=False)
+            verifymessage = json.loads(verifyrep.content)
+            if verifymessage['errors_code'] == 0:
+                return False
+            if verifymessage['errors_code'] == 10004002:
+                # 需要在数据库中更新token和refreshtoken
+                refreshrep = requests.post('https://%s%s' % (config.OAUTH_URL, config.OAUTH_REQUIRE_TOKEN_URL),
+                                            data={'grant_type': 'refresh_token', 'refresh_token': refreshtoken,
+                                                    'client_id': config.CLIENT_ID},
+                                            verify=False
+                                           )
+                newtokenmessage = json.loads(refreshrep.content)
+                newtoken = newtokenmessage['access_token']
+                newtoken_crypt = decrypt(newtoken)
+                newrefreshtoken = newtokenmessage['refresh_token']
+
+                newverifyrep = requests.post('https://%s%s' % (config.OAUTH_URL, config.OAUTH_VARIFY_URL),
+                                            data={'client_id': config.CLIENT_ID, 'token': newtoken_crypt},
+                                            verify=False)
+                newverifymessage = json.loads(newverifyrep.content)
+                if newverifymessage['errors_code'] == 0:
+                    user_id = newverifymessage['userID']
+                    user_name = newverifymessage['username']
+                    LoginInfoDao.deleteByuserid(user_id)
+                    login_info = LoginInfo(uid, newtoken, newrefreshtoken, user_id, user_name, time.time())
+                    LoginInfoDao.add(login_info)
+                    return False
+                else:
+                    return True
+            else:
+                return True
     except:
         return True
+
 
 def login_required(func):
     '''测试登陆状态，如果未登陆则跳转到登陆页面'''
@@ -118,8 +187,16 @@ def login_required(func):
     return decoratedFunc
 
 
-@app.route('/')
+
+@app.route('/', methods=['GET'])
+@login_required
 def test():
+    # token = flask.request.form.get('token')
+    # if token:
+    #     return flask.jsonify({
+    #         'code': 0,
+    #         'token': token
+    #     })
     return 'success'
 
 
@@ -127,9 +204,25 @@ def test():
     #                                            'ssy', time.time())
     # model.logininfo.LoginInfoDao.add(logininfoclass)
 
-    return rep.text
 
+@app.route('/user/queryusername', methods=['GET'])
+@login_required
+def queryUsername():
+    uid = flask.session['uid']
+    login_info = LoginInfoDao.queryByuid(uid)
+    if login_info:
+        return flask.jsonify({'username': login_info.username, 'code': 0})
+    else:
+        return flask.jsonify({'code': -601})
 
+@app.route('/user/logout', methods=['GET'])
+def logout():
+    uid = flask.session['uid']
+    if LoginInfoDao.queryByuid(uid):
+        flask.session['uid'] = ''
+        return flask.jsonify({'code': 0})
+    else:
+        return flask.jsonify({'code': -602})
 
 
 app.run('127.0.0.1',8888)

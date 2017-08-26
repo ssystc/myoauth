@@ -69,23 +69,24 @@ def v_login():
     return rep.text
 
 
-token='ekAZrlf0A3rIOrVGHCzgXCxorqP337ydXWq0KRjA1b7iZ8CUhvlAb9W589gfmsfjye0I0k0UOQZ0oA8csOpq2UnmWUIdE0sOCI3ZnShasoTU3UKZmOU+iDgLnNdCirGzBOwJSe0JGG9qIoP9l4SJ3YBAJPlJNLiMorcHv8wCywM='
-refreshtoken='z//T9+9KSqFQbTiaPhvMrJEv2HTDp3C0t4calLygMHOTpFNlW/nvvcq9seMhsZcWdE/uH/u1z5GsbHhshez4tvs6sKoMGqFMQByFnZBrhGW7o45JAAgTRR/MSglnBb9j1IXSwKnzqQvPT9dEeJ5pkOix16oXejHThsAlwF9J2FY='
+token='EnuQHBzNFQdShxGdKcXS7LpROB+ihAa2rSyNcyFGg2phbcCzmWqEBKJiFaLBfUGxSWq75zyJNqx4Ss4oRRCUDoUSOGWIAftQZlpxXAxY9A1i22MhDa81BGTKXhYnxwf22GVvV7hAemnjkRrK4yOUzdUyl8PCC9N75Zuvi7dQN4s='
+refreshtoken='FehMYmH/9s4g/iSv7v2TCBqj9ufBZpSN3rBCake67xiM2rmuafIsHdQBhlgIlM+XWBl1YrdLpaaAgGau1BHOaU/1E67ozIWBy83itLbOGDRjFF+FWuVriGEWywo6VF8ZvKAqFGuTu5LperDAVgRkhtG6rNxzFlQACuLN4aYh/PU='
+newtoken = 'VHsLRd50RihYHZgahPrXrAWg14fsqK9GHGw12ffUXB0a9sMYx1R9xCmj9XX/WRIyG9EJ0sRCRGwUFrTGg32blw9Fr2nWvcPjyD2AkbBS/G2N6puPmtRWoBVXcQB85t4NGzwSIXuInx+wC0rQ82gepxtNPlVrjmrGwx0R6ckqNUQ='
 
 token_jiemi=jiemi(token)
-refreshtoken_jiemi=jiemi(refreshtoken)
+newtoken_jiemi = jiemi(newtoken)
 
-print token_jiemi
-print refreshtoken_jiemi
 
-refreshrep=requests.post('https://192.168.4.225:8443/user_oauth/oauth-server-idp/oauth2/access_token',
-                         data={'grant_type':'refresh_token', 'refresh_token':refreshtoken_jiemi, 'client_id': '200010035116400'},
-                         verify=False
-                         )
-print refreshrep.text
+# print token_jiemi
+#
+# refreshrep=requests.post('https://192.168.4.225:8443/user_oauth/oauth-server-idp/oauth2/access_token',
+#                          data={'grant_type':'refresh_token', 'refresh_token':refreshtoken, 'client_id': '200010035116400'},
+#                          verify=False
+#                          )
+# print refreshrep.text
 
 # verifyrep=requests.post("https://192.168.4.225:8443/user_oauth/oauth-server-idp/verify2",
-#                         data={'client_id': '200010035116400', 'token': token_jiemi},
+#                         data={'client_id': '200010035116400', 'token': newtoken_jiemi},
 #                         verify=False)
 #
 # print verifyrep.text
@@ -96,4 +97,4 @@ print refreshrep.text
 
 
 
-# app.run('127.0.0.1',8888)
+app.run('127.0.0.1',8888)

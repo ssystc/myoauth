@@ -43,6 +43,16 @@ class LoginInfoDao(object):
             session.query(LoginInfo).filter(LoginInfo.userid == userid).delete()
 
     @classmethod
+    def deleteByuid(cls,uid):
+        with session_scope() as session:
+            try:
+                session.query(LoginInfo).filter(LoginInfo.uid == uid).delete()
+                return uid
+            except:
+                return None
+
+
+    @classmethod
     def deleteAll(cls):
         with session_scope() as session:
             session.query(LoginInfo).filter().delete()
@@ -51,3 +61,27 @@ class LoginInfoDao(object):
     def getUserId(cls, uid):
         info = cls.queryByuid(uid)
         return info.userid if info else ''
+
+    @classmethod
+    def queryBytoken(cls,token):
+        with session_scope() as session:
+            try:
+                return session.query(LoginInfo).filter(LoginInfo.token == token).one()
+            except:
+                return None
+
+    @classmethod
+    def queryByuserid(cls,userid):
+        with session_scope() as session:
+            try:
+                return session.query(LoginInfo).filter(LoginInfo.userid == userid).one()
+            except:
+                return None
+
+    @classmethod
+    def querytokenByusername(cls, username, userId):
+        with session_scope() as session:
+            try:
+                return session.query(LoginInfo).filter(LoginInfo.username == username, LoginInfo.userid == userId).all()
+            except:
+                return []

@@ -26,6 +26,7 @@ def session_scope():
 
 import model.userinfo
 import model.logininfo
+import model.stateclan
 
 Base.metadata.create_all(engine)
 

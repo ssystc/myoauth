@@ -3,7 +3,7 @@
 import flask
 from flask import Flask
 import config
-
+import requests
 
 
 app=Flask(__name__)
@@ -22,3 +22,6 @@ def test():
 
 
 app.run('127.0.0.1',8999)
+
+# rep = requests.get('http://127.0.0.1:8888/')
+# print rep.content
